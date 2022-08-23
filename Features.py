@@ -1,6 +1,9 @@
 from __init__ import *
-from utils import *
-from Setting import *
+# from utils import *
+import utils as _U
+reload(_U)
+import Setting as _C
+reload(_C)
 
 def price_adj(stmp, PADJ):
     if PADJ:
@@ -21,7 +24,7 @@ def technical_analysis(stmp, logger = True, PADJ=True, save=True):
     stmp = stmp.loc[~stmp['CLOCK'].duplicated()]
     stmp = price_adj(stmp.copy(deep=True), PADJ)
 
-    with timer('TR', 20, logger):
+    with _U.timer('TR', 20, logger):
         ## TR
         TR = []
         TR.append(stmp['HIGH_adj'][0] - stmp['LOW_adj'][0])
@@ -72,11 +75,11 @@ def technical_analysis(stmp, logger = True, PADJ=True, save=True):
         
         return _stmp['UB'], _stmp['LB'], _stmp['STD']
     
-    with timer('Short Super Trend', 20, logger):
-        stmp['UB_S'], stmp['LB_S'], stmp['STD_S'] = STD_CAL(ATR_WIN_S, STD_MULTIPLIER_S, stmp.copy(deep=True))
+    with _U.timer('Short Super Trend', 20, logger):
+        stmp['UB_S'], stmp['LB_S'], stmp['STD_S'] = STD_CAL(_C.ATR_WIN_S, _C.STD_MULTIPLIER_S, stmp.copy(deep=True))
 
-    with timer('Long Super Trend', 20, logger):
-        stmp['UB_L'], stmp['LB_L'], stmp['STD_L'] = STD_CAL(ATR_WIN_L, STD_MULTIPLIER_L, stmp.copy(deep=True))
+    with _U.timer('Long Super Trend', 20, logger):
+        stmp['UB_L'], stmp['LB_L'], stmp['STD_L'] = STD_CAL(_C.ATR_WIN_L, _C.STD_MULTIPLIER_L, stmp.copy(deep=True))
 
     if save:
         scom = stmp['SYMBOL'][0].split('.')[-2]

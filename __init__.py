@@ -15,6 +15,7 @@ from IPython.display import clear_output
 # import dill as pickle
 import pickle
 import time
+from imp import reload
 
 ## api
 from causis_api.const import get_version
