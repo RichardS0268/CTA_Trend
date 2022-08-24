@@ -116,18 +116,24 @@ def Dataset(timeframe, start_date='2010-01-01', end_date='2022-08-19'):
         start_date_delta = (pd.to_datetime(start_date) - pd.to_datetime(VTD[0])).total_seconds()/(60*60*24) # s->min->h->d
         end_date_delta = (pd.to_datetime(end_date) - pd.to_datetime(VTD[-1])).total_seconds()/(60*60*24) # s->min->h->d
 
-        if (np.abs(start_date_delta) < 5) and (np.abs(end_date_delta) < 5):
+        if (start_date_delta < 0) or (end_date_delta > 0): # if gap between required data and local data is too large, update data
+            print(f'VTD Bias | Local Data VTD: {VTD[0]}--{VTD[-1]}, BackTest VTD: {start_date}--{end_date}')
+            F_data = Download_data(timeframe, start_date, end_date)
+
+        else:
             time_delta = (pd.to_datetime(F_data['rb']['CLOCK'][1])-pd.to_datetime(F_data['rb']['CLOCK'][0])).total_seconds()/60
 
             if time_delta != T_delta[timeframe]:
                 print(f'Error: Time Frame is not {timeframe}!')
                 F_data = Download_data(timeframe, start_date, end_date)
             else:
-                print(f"Using Local {timeframe:5} Data | BackTest VTD: {VTD[0]}--{VTD[-1]}")
+                print(f"Using Local {timeframe:5} Data | Local VTD: {VTD[0]}--{VTD[-1]}, BackTest VTD: {start_date}--{end_date}")
+                for com in commodities.keys():
+                    com_data = F_data[com]
+                    com_data = com_data.set_index('CLOCK', drop=False)
+                    com_data = com_data[start_date+' 09:00:00':end_date+' 15:00:00']
+                    F_data[com] = com_data
 
-        else:
-            print(f'VTD Bias | Local Data VTD: {VTD[0]}--{VTD[-1]}')
-            F_data = Download_data(timeframe, start_date, end_date)
     else:
         print(f'No Local Data of {timeframe}')
         F_data = Download_data(timeframe, start_date, end_date)

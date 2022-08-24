@@ -154,8 +154,8 @@ def log_patch(trading_log):
 
 def Trading_trace(COM_ID, tick, COM_ID_VTD):
     ## trigger execution
-    BUY_log = BUY_Trade(COM_ID, tick, logger=False) 
-    SELL_log = SELL_Trade(COM_ID, tick, logger=False)
+    BUY_log = BUY_Trade(COM_ID, tick, logger=True) 
+    SELL_log = SELL_Trade(COM_ID, tick, logger=True)
 
     buy = BUY_log.set_index('open_bar', drop=False)
     sell = SELL_log.set_index('open_bar', drop=False)
@@ -249,7 +249,7 @@ def Simulation(scom, Balance, COM_ID, trading_log, SYM_VTD, dc_change):
  
 
 ## Simulate Single Symbol
-def Simulation_all_in_one(scom, sig_filter, logger, f_save):
+def Simulation_all_in_one(scom, logger, f_save):
 
     if logger:
         rank = list(_D.commodities.keys()).index(scom)+1
@@ -269,7 +269,7 @@ def Simulation_all_in_one(scom, sig_filter, logger, f_save):
     COM_D = COM_D.ffill()
 
     with _U.timer('Feature and Trigger', 25, logger):
-        COM_ID, COM_D = _S.Feature_and_Trigger(COM_ID, COM_D, filter=sig_filter, f_save=f_save)
+        COM_ID, COM_D = _S.Feature_and_Trigger(COM_ID, COM_D, filter=_C.FILTER, f_save=f_save)
 
     TICK = _D.commodities[scom]['mintick'] * _C.SLIPPAGE
 
@@ -298,8 +298,8 @@ def Simulation_all_in_one(scom, sig_filter, logger, f_save):
 
 
 ## wrapper for multi-process running
-def wrapper_simulation(scom_, sig_filter_, logger_, f_save=True):
-    balance, sym_logs = Simulation_all_in_one(scom_, sig_filter_, logger_, f_save)
+def wrapper_simulation(scom_, logger_, f_save=True):
+    balance, sym_logs = Simulation_all_in_one(scom_, logger_, f_save)
     ## save files
     balance.to_csv(f'./output/balance_sheet/{_C.VERSION}/{scom_}_balance.csv')
     sym_logs = np.array(sym_logs)
