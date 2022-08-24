@@ -33,14 +33,14 @@ def EMA_filter(_stmp):
 
 
 ## All in one Function
-def Feature_and_Trigger(COM_5, COM_D, filter, f_save):
+def Feature_and_Trigger(COM_ID, COM_D, filter, f_save):
 
-    COM_5 = _F.technical_analysis(COM_5, logger=False, PADJ=False, save=f_save)
-    COM_5 =  Double_STD_trigger(COM_5)
+    COM_ID = _F.technical_analysis(COM_ID, logger=False, PADJ=False, save=f_save)
+    COM_ID =  Double_STD_trigger(COM_ID)
 
     if filter:
         BSM_EMA, SSM_EMA = EMA_filter(COM_D)
-        COM_5['trigger'].loc[(COM_5['DATE'].apply(lambda x: x in BSM_EMA)) & (COM_5['trigger']==1)] = 0.0
-        COM_5['trigger'].loc[(COM_5['DATE'].apply(lambda x: x in SSM_EMA)) & (COM_5['trigger']==-1)] = 0.0
+        COM_ID['trigger'].loc[(COM_ID['DATE'].apply(lambda x: x in BSM_EMA)) & (COM_ID['trigger']==1)] = 0.0
+        COM_ID['trigger'].loc[(COM_ID['DATE'].apply(lambda x: x in SSM_EMA)) & (COM_ID['trigger']==-1)] = 0.0
 
-    return COM_5, COM_D
+    return COM_ID, COM_D

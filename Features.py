@@ -83,6 +83,6 @@ def technical_analysis(stmp, logger = True, PADJ=True, save=True):
 
     if save:
         scom = stmp['SYMBOL'][0].split('.')[-2]
-        stmp.to_csv(f'output/features/{scom}_features.csv')
+        stmp.to_csv(f'output/features/{_C.VERSION}/{scom}_features.csv')
 
     return stmp

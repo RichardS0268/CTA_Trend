@@ -1,6 +1,7 @@
 import pandas as pd
 # import modin.pandas as mpd
 import numpy as np
+import os
 import datetime
 from scipy.stats import norm
 from tqdm import tqdm
@@ -15,6 +16,7 @@ from IPython.display import clear_output
 # import dill as pickle
 import pickle
 import time
+import gc
 from imp import reload
 
 ## api
