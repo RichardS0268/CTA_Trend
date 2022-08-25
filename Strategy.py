@@ -48,7 +48,7 @@ def FLUCT_filter(_stmp):
     COM_1['FLUCT_quantile_H'] = COM_1['FLUCT'].rolling(300, min_periods=1).quantile(0.45)
     t_slice_con = list((COM_1['FLUCT'] > COM_1['FLUCT_quantile_L']) & (COM_1['FLUCT'] < COM_1['FLUCT_quantile_H']))
     signal_mask = [t_slice_con[i*5-1] for i in range(len(t_slice_con)//5)]
-    signal_mask = pd.Series(signal_mask, index=_stmp.index())
+    signal_mask = pd.Series(signal_mask, index=_stmp.index)
     
     return signal_mask
 
@@ -56,7 +56,7 @@ def FLUCT_filter(_stmp):
 ## All in one Function
 def Feature_and_Trigger(COM_ID, COM_D, filter, f_save):
 
-    COM_ID = _F.technical_analysis(COM_ID, PADJ=_C.PADJ, logger=False, save=f_save)
+    COM_ID = _F.technical_analysis(COM_ID, PADJ=_C.PADJ, logger=False)
     COM_ID =  Double_STD_trigger(COM_ID)
 
     if len(filter):
@@ -70,5 +70,9 @@ def Feature_and_Trigger(COM_ID, COM_D, filter, f_save):
                 COM_ID['trigger'].loc[~SM] = 0.0
             else:
                 print('No Such Filter')
+
+    if f_save:
+        scom = COM_ID['SYMBOL'][0].split('.')[-2]
+        COM_ID.to_csv(f'output/features/{_C.VERSION}/{scom}_features.csv')
 
     return COM_ID, COM_D

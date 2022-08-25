@@ -20,7 +20,7 @@ def price_adj(stmp, PADJ):
     return stmp
 
 
-def technical_analysis(stmp, PADJ, logger = True, save=True):
+def technical_analysis(stmp, PADJ, logger = True):
     stmp = stmp.loc[~stmp['CLOCK'].duplicated()]
     stmp = price_adj(stmp.copy(deep=True), PADJ)
 
@@ -83,9 +83,5 @@ def technical_analysis(stmp, PADJ, logger = True, save=True):
 
     with _U.timer('Plus Super Trend', 20, logger):
         stmp['UB_P'], stmp['LB_P'], stmp['STD_P'] = STD_CAL(_C.ATR_WIN_P, _C.STD_MULTIPLIER_P, stmp.copy(deep=True))
-
-    if save:
-        scom = stmp['SYMBOL'][0].split('.')[-2]
-        stmp.to_csv(f'output/features/{_C.VERSION}/{scom}_features.csv')
 
     return stmp

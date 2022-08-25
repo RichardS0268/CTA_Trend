@@ -1,9 +1,10 @@
 
 #TODO: Global variables
-VERSION = 'v3'
+VERSION = 'v4'
 
 ## Data TimeFrame
 TIME_FRAME = '5min'
+TIME_FRAME_MUL = 5
 BACKTEST_START = '2010-01-04'
 BACKTEST_END = '2022-08-19'
 
@@ -22,7 +23,7 @@ ATR_WIN_P = 5
 STD_MULTIPLIER_P = 2
 
 ## Indicator Filter
-FILTER = ['FLUCT_filter']
+FILTER = ['EMA_filter']
 
 ## BackTest & Simulation Parameters
 PADJ = False # using adj price or not
