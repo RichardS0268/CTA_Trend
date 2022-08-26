@@ -1,6 +1,6 @@
 ### All Hyper Parameters 
 ## version tag
-VERSION = 'v1'
+VERSION = 'v2'
 
 ## Data TimeFrame
 TIME_FRAME = '5min'

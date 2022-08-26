@@ -64,14 +64,16 @@ def Feature_and_Trigger(COM_ID, COM_D, filter, f_save):
             if f == 'EMA':
                 # print('EMA filter')
                 D_DOWN, D_UP = EMA_filter(COM_D)
-                COM_ID['Date'] = COM_ID['CLOCK'].apply(lambda x: x[10:])
-                for t in COM_ID.loc[COM_ID['trigger']>0]['CLOCK']:
+                COM_ID['Date'] = COM_ID['CLOCK'].apply(lambda x: x[:10])
+                for t in COM_ID.loc[COM_ID['trigger']>0.1]['CLOCK']:
                     if COM_ID.loc[t]['Date'] in D_DOWN:
                         COM_ID['trigger'].loc[t] = 0.0
+                        assert COM_ID.loc[t]['trigger'] == 0.0, 'No change?'
 
-                for t in COM_ID.loc[COM_ID['trigger']<0]['CLOCK']:
+                for t in COM_ID.loc[COM_ID['trigger']<-0.1]['CLOCK']:
                     if COM_ID.loc[t]['Date'] in D_UP:
                         COM_ID['trigger'].loc[t] = 0.0
+                        assert COM_ID.loc[t]['trigger'] == 0.0, 'No change?'
   
             elif f == 'FLUCT':
                 # print('FLUCT filter')
