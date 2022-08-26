@@ -11,8 +11,8 @@ reload(_D)
 
 def BUY_Trade(Symbol, tick, logger):
     
-    BUY_trigger_list = list(Symbol['trigger'].loc[Symbol['trigger']== 2].index)
-    BUY_observation_list = list(Symbol['trigger'].loc[Symbol['trigger']== 1].index)
+    BUY_trigger_list = list(Symbol['trigger'].loc[Symbol['trigger']== 2.].index)
+    BUY_observation_list = list(Symbol['trigger'].loc[Symbol['trigger']== 1.].index)
 
     BUY_log = pd.DataFrame(columns=['open_bar', 'close_bar', 'open_price', 'close_price', 'close_reason'])
     clock_rank = Symbol['CLOCK'].to_list()
@@ -38,30 +38,32 @@ def BUY_Trade(Symbol, tick, logger):
         loss_cut = Symbol.loc[open_bar]['LB_S']
         profit_cut = Symbol.loc[open_bar]['OPEN'] * (1 + _C.REWARD_RATIO) 
 
-        if Symbol['CLOCK'].loc[t:].loc[Symbol['STD_L']==-1].shape[0]: # fork change coming, interrupt the simulation
-            close_bar = clock_rank[min(clock_rank.index(Symbol['CLOCK'].loc[t:].loc[Symbol['STD_L']==-1][0])+1, len(clock_rank)-1)]
+        if Symbol['CLOCK'].loc[t:].loc[Symbol['STD_L']==-1.].shape[0]: # fork change coming, interrupt the simulation
+            close_bar = clock_rank[min(clock_rank.index(Symbol['CLOCK'].loc[t:].loc[Symbol['STD_L']==-1.][0])+1, len(clock_rank)-1)]
         else:
             close_bar = clock_rank[-1]
 
-        # for i in range(1, int((pd.to_datetime(close_bar) - pd.to_datetime(t)).total_seconds()/(60*_C.TIME_FRAME_MUL))):
-        #     observation_bar = clock_rank[min(clock_rank.index(open_bar)+i, len(clock_rank)-1)]
+        for i in range(1, int((pd.to_datetime(close_bar) - pd.to_datetime(t)).total_seconds()/(60*_C.TIME_FRAME_MUL))):
+            observation_bar = clock_rank[min(clock_rank.index(open_bar)+i, len(clock_rank)-1)]
+            if observation_bar > close_bar:
+                break
 
-        #     if observation_bar in BUY_trigger_list:
-        #         loss_cut = Symbol.loc[observation_bar]['LB_S']
-        #         del BUY_trigger_list[BUY_trigger_list.index(observation_bar)]
+            if observation_bar in BUY_trigger_list:
+                loss_cut = Symbol.loc[observation_bar]['LB_S']
+                del BUY_trigger_list[BUY_trigger_list.index(observation_bar)]
 
-        #     if observation_bar in BUY_observation_list:
-        #         loss_cut = Symbol.loc[observation_bar]['LB_S']            
+            if observation_bar in BUY_observation_list:
+                loss_cut = Symbol.loc[observation_bar]['LB_L']            
 
-        #     if (Symbol['LOW'].loc[observation_bar] <= loss_cut):
-        #         close_bar = clock_rank[min(clock_rank.index(observation_bar)+1, len(clock_rank)-1)]
-        #         close_reason = 'Loss_Cut'
-        #         break
+            if (Symbol['LOW'].loc[observation_bar] <= loss_cut):
+                close_bar = clock_rank[min(clock_rank.index(observation_bar)+1, len(clock_rank)-1)]
+                close_reason = 'Loss_Cut'
+                break
 
-        #     if (Symbol['HIGH'].loc[observation_bar] >= profit_cut):
-        #         close_bar = clock_rank[min(clock_rank.index(observation_bar)+1, len(clock_rank)-1)]
-        #         close_reason = 'Profit_Cut'
-        #         break
+            if (Symbol['HIGH'].loc[observation_bar] >= profit_cut):
+                close_bar = clock_rank[min(clock_rank.index(observation_bar)+1, len(clock_rank)-1)]
+                close_reason = 'Profit_Cut'
+                break
 
         close_reason = 'non'
         close_price = Symbol['OPEN'].loc[close_bar] - tick
@@ -76,8 +78,8 @@ def BUY_Trade(Symbol, tick, logger):
 
 def SELL_Trade(Symbol, tick, logger):
     
-    SELL_trigger_list = list(Symbol['trigger'].loc[Symbol['trigger']==-2].index)
-    SELL_observation_list = list(Symbol['trigger'].loc[Symbol['trigger']==-1].index)
+    SELL_trigger_list = list(Symbol['trigger'].loc[Symbol['trigger']==-2.].index)
+    SELL_observation_list = list(Symbol['trigger'].loc[Symbol['trigger']==-1.].index)
 
     SELL_log = pd.DataFrame(columns=['open_bar', 'close_bar', 'open_price', 'close_price', 'close_reason'])
     clock_rank = Symbol['CLOCK'].to_list()
@@ -108,25 +110,27 @@ def SELL_Trade(Symbol, tick, logger):
         else:
             close_bar = clock_rank[-1]
 
-        # for i in range(1, int((pd.to_datetime(close_bar) - pd.to_datetime(t)).total_seconds()/(60*_C.TIME_FRAME_MUL))):
-        #     observation_bar = clock_rank[min(clock_rank.index(open_bar)+i, len(clock_rank)-1)]
+        for i in range(1, int((pd.to_datetime(close_bar) - pd.to_datetime(t)).total_seconds()/(60*_C.TIME_FRAME_MUL))):
+            observation_bar = clock_rank[min(clock_rank.index(open_bar)+i, len(clock_rank)-1)]
+            if observation_bar > close_bar:
+                break
 
-        #     if observation_bar in SELL_trigger_list:
-        #         loss_cut = Symbol.loc[observation_bar]['UB_S']
-        #         del SELL_trigger_list[SELL_trigger_list.index(observation_bar)]
+            if observation_bar in SELL_trigger_list:
+                loss_cut = Symbol.loc[observation_bar]['UB_S']
+                del SELL_trigger_list[SELL_trigger_list.index(observation_bar)]
 
-        #     if observation_bar in SELL_observation_list:
-        #         loss_cut = Symbol.loc[observation_bar]['UB_S']            
+            if observation_bar in SELL_observation_list:
+                loss_cut = Symbol.loc[observation_bar]['UB_L']            
 
-        #     if Symbol['HIGH'].loc[observation_bar] >= loss_cut:
-        #         close_bar = clock_rank[min(clock_rank.index(observation_bar)+1,len(clock_rank)-1)]
-        #         close_reason = 'Loss_Cut'
-        #         break
+            if Symbol['HIGH'].loc[observation_bar] >= loss_cut:
+                close_bar = clock_rank[min(clock_rank.index(observation_bar)+1,len(clock_rank)-1)]
+                close_reason = 'Loss_Cut'
+                break
 
-        #     if Symbol['LOW'].loc[observation_bar] <= profit_cut:
-        #         close_bar = clock_rank[min(clock_rank.index(observation_bar)+1,len(clock_rank)-1)]
-        #         close_reason = 'Profit_Cut'
-        #         break
+            if Symbol['LOW'].loc[observation_bar] <= profit_cut:
+                close_bar = clock_rank[min(clock_rank.index(observation_bar)+1,len(clock_rank)-1)]
+                close_reason = 'Profit_Cut'
+                break
 
         close_reason = 'non'
         close_price = Symbol['OPEN'].loc[close_bar] + tick
@@ -309,30 +313,37 @@ def Simulation_all_in_one(scom, logger, f_save):
     TICK = _D.commodities[scom]['mintick'] * _C.SLIPPAGE
     logs = Trading_trace(COM_ID, TICK, COM_ID_VTD, logger)
    
-    Balance = pd.DataFrame()
-    Balance = Balance.reindex(COM_ID_VTD )
-    # import numpy as np # VM BUG
-    Balance['Account']  = np.zeros(Balance.shape[0])
-    Balance['interday_profit'] = np.zeros(Balance.shape[0])
-    Balance['holding_profit'] = np.zeros(Balance.shape[0])
-    Balance['holding_pos'] = np.zeros(Balance.shape[0])
-    Balance['dc_change_gap'] = np.zeros(Balance.shape[0])
+
+    Balance_dict = {}
+    keys = ['buy_balance', 'sell_balance', 'all_balance']
 
     with _U.timer('Trading Simulation', 25, logger):
         dc_change = Dominant_change(scom, COM_ID, COM_ID_VTD) 
-        Balance['holding_pos'] = np.zeros(Balance.shape[0])
-        Balance = Simulation(scom=scom, Balance=Balance, COM_ID=COM_ID, trading_log=logs[2], SYM_VTD=COM_ID_VTD, dc_change=dc_change, save_pos=True)
 
-    Balance['d_gain'] = Balance['interday_profit'] + Balance['holding_profit'] +  Balance['dc_change_gap']
-    Balance['Pnl'] = Balance['d_gain'].cumsum()/_C.INIT_CAP + 1
-    
-    return Balance, logs
+        for i in range(3):
+            Balance = pd.DataFrame()
+            Balance = Balance.reindex(COM_ID_VTD)
+            Balance['Account']  = np.zeros(Balance.shape[0])
+            Balance['interday_profit'] = np.zeros(Balance.shape[0])
+            Balance['holding_profit'] = np.zeros(Balance.shape[0])
+            Balance['holding_pos'] = np.zeros(Balance.shape[0])
+            Balance['dc_change_gap'] = np.zeros(Balance.shape[0])
+
+            Balance = Simulation(scom=scom, Balance=Balance, COM_ID=COM_ID, trading_log=logs[i], SYM_VTD=COM_ID_VTD, dc_change=dc_change, save_pos=True)
+
+            Balance['d_gain'] = Balance['interday_profit'] + Balance['holding_profit'] +  Balance['dc_change_gap']
+            Balance['Pnl'] = Balance['d_gain'].cumsum()/_C.INIT_CAP + 1
+            
+            Balance_dict[keys[i]] = Balance
+
+    return Balance_dict, logs
 
 
 ## wrapper for multi-process running
 def wrapper_simulation(scom_, logger_, f_save=True):
-    balance, sym_logs = Simulation_all_in_one(scom_, logger_, f_save)
+    Balance_dict, sym_logs = Simulation_all_in_one(scom_, logger_, f_save)
     ## save files
-    balance.to_csv(f'./output/balance_sheet/{_C.VERSION}/{scom_}_balance.csv')
-    sym_logs = np.array(sym_logs)
-    np.save(f'./output/trading_logs/{_C.VERSION}/{scom_}_logs.npy', sym_logs)
+    with open(f'./output/balance_sheet/{_C.VERSION}/{scom_}_balance.npy', 'wb') as f:
+        pickle.dump(Balance_dict, f)
+
+    np.save(f'./output/trading_logs/{_C.VERSION}/{scom_}_logs.npy', np.array(sym_logs))

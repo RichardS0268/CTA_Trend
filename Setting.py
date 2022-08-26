@@ -1,6 +1,6 @@
-
-#TODO: Global variables
-VERSION = 'v4'
+### All Hyper Parameters 
+## version tag
+VERSION = 'v1'
 
 ## Data TimeFrame
 TIME_FRAME = '5min'
@@ -23,11 +23,11 @@ ATR_WIN_P = 5
 STD_MULTIPLIER_P = 2
 
 ## Indicator Filter
-FILTER = ['EMA_filter']
+FILTER = ['EMA']
 
 ## BackTest & Simulation Parameters
-PADJ = False # using adj price or not
-ACCOUNT = 1e6
+PADJ = True # using adj price or not
+ACCOUNT = 1e6 
 INIT_CAP = 1e8
 REWARD_RATIO = 0.15
 SLIPPAGE = 0

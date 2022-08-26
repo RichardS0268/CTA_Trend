@@ -5,24 +5,10 @@ reload(_U)
 import Setting as _C
 reload(_C)
 
-def price_adj(stmp, PADJ):
-    if PADJ:
-        stmp['OPEN_adj'] = round(stmp['OPEN'] * stmp['ADJ'], 2)
-        stmp['CLOSE_adj'] = round(stmp['CLOSE'] * stmp['ADJ'], 2)
-        stmp['HIGH_adj'] = round(stmp['HIGH'] * stmp['ADJ'], 2)
-        stmp['LOW_adj'] = round(stmp['LOW'] * stmp['ADJ'], 2)
-    else:
-        stmp['OPEN_adj'] = stmp['OPEN'] 
-        stmp['CLOSE_adj'] = stmp['CLOSE'] 
-        stmp['HIGH_adj'] = stmp['HIGH'] 
-        stmp['LOW_adj'] = stmp['LOW'] 
-
-    return stmp
-
 
 def technical_analysis(stmp, PADJ, logger = True):
     stmp = stmp.loc[~stmp['CLOCK'].duplicated()]
-    stmp = price_adj(stmp.copy(deep=True), PADJ)
+    stmp = _U.price_adj(stmp.copy(deep=True), PADJ)
 
     with _U.timer('TR', 20, logger):
         ## TR
@@ -53,7 +39,7 @@ def technical_analysis(stmp, PADJ, logger = True):
             else:
                 LB.append(_stmp['blb'][i])
             
-            if _stmp['CLOSE'][i-1] < UB[i-1]:
+            if _stmp['CLOSE_adj'][i-1] < UB[i-1]:
                 UB.append(min(_stmp['bub'][i], UB[i-1]))
             else:
                 UB.append(_stmp['bub'][i])

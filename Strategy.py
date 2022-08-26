@@ -27,14 +27,14 @@ def Double_STD_trigger(stmp):
 
 
 ## EMA Filter
-def EMA_filter(_stmp_id, _stmp_d):
+def EMA_filter(_stmp_d):
     # param: Day bars data
     _stmp_d['EMA_S'] = _stmp_d['CLOSE'].ewm(span=_C.DAY_EMA_S, adjust=False).mean()
     _stmp_d['EMA_L'] = _stmp_d['CLOSE'].ewm(span=_C.DAY_EMA_L, adjust=False).mean()
-    Buy_signal_mask  = (_stmp_d['EMA_S']<_stmp_d['EMA_L']) & (_stmp_id['trigger'] >  0.5)
-    Sell_signal_mask = (_stmp_d['EMA_S']>_stmp_d['EMA_L']) & (_stmp_id['trigger'] < -0.5)
+    d_down = _stmp_d.loc[_stmp_d['EMA_S']<_stmp_d['EMA_L']]['CLOCK'].to_list()
+    d_up = _stmp_d.loc[_stmp_d['EMA_S']>_stmp_d['EMA_L']]['CLOCK'].to_list()
 
-    return Buy_signal_mask, Sell_signal_mask
+    return d_down, d_up
 
 
 def FLUCT_filter(_stmp):
@@ -61,15 +61,26 @@ def Feature_and_Trigger(COM_ID, COM_D, filter, f_save):
 
     if len(filter):
         for f in filter:
-            if f == 'EMA_filter':
-                BSM_EMA, SSM_EMA = EMA_filter(COM_ID, COM_D)
-                COM_ID['trigger'].loc[BSM_EMA] = 0.0
-                COM_ID['trigger'].loc[SSM_EMA] = 0.0
-            elif f == 'FLUCT_filter':
+            if f == 'EMA':
+                # print('EMA filter')
+                D_DOWN, D_UP = EMA_filter(COM_D)
+                COM_ID['Date'] = COM_ID['CLOCK'].apply(lambda x: x[10:])
+                for t in COM_ID.loc[COM_ID['trigger']>0]['CLOCK']:
+                    if COM_ID.loc[t]['Date'] in D_DOWN:
+                        COM_ID['trigger'].loc[t] = 0.0
+
+                for t in COM_ID.loc[COM_ID['trigger']<0]['CLOCK']:
+                    if COM_ID.loc[t]['Date'] in D_UP:
+                        COM_ID['trigger'].loc[t] = 0.0
+  
+            elif f == 'FLUCT':
+                # print('FLUCT filter')
                 SM = FLUCT_filter(COM_ID)
                 COM_ID['trigger'].loc[~SM] = 0.0
             else:
                 print('No Such Filter')
+    # else:
+    #     print('No filter')
 
     if f_save:
         scom = COM_ID['SYMBOL'][0].split('.')[-2]
