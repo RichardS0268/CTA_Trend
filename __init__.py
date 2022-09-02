@@ -22,10 +22,5 @@ from multiprocessing import Pool
 from functools import partial
 
 ## api
-from causis_api.const import get_version
-from causis_api.const import login
-login.username = 'shuai.song'
-login.password = 'Tsinghua2022'
-login.version = get_version()
-from causis_api.data import *
-from causis_api.tool import *
+
+##
