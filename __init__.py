@@ -18,6 +18,8 @@ import pickle
 import time
 import gc
 from imp import reload
+from multiprocessing import Pool
+from functools import partial
 
 ## api
 from causis_api.const import get_version
